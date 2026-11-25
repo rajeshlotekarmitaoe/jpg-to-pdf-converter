@@ -349,14 +349,6 @@ hr {
         padding: 22px 20px;
         border-radius: 18px;
     }
-    [data-testid="stTabs"] [data-baseweb="tab-list"] {
-        gap: 4px;
-        padding: 5px;
-    }
-    [data-testid="stTabs"] button[role="tab"] {
-        padding: 9px 10px;
-        font-size: 12px;
-    }
 }
 
 /* ===== Readability + typography refinement ===== */
@@ -475,42 +467,28 @@ div.stDownloadButton > button * {
         font-size: 15px !important;
     }
 
-    /* Keep all three main app sections clearly visible on mobile.
-       The tabs remain functional; only their mobile layout changes. */
-    [data-testid="stTabs"] [data-baseweb="tab-list"] {
-        display: flex !important;
+    /* Mobile: show each main section as a full-width selectable row. */
+    .st-key-main_section [data-testid="stRadio"] > div {
         flex-direction: column !important;
-        flex-wrap: nowrap !important;
         align-items: stretch !important;
         gap: 8px !important;
         width: 100% !important;
-        height: auto !important;
-        overflow: visible !important;
-        padding: 9px !important;
     }
 
-    [data-testid="stTabs"] button[role="tab"] {
-        display: flex !important;
-        flex: 0 0 auto !important;
-        justify-content: flex-start !important;
-        align-items: center !important;
+    .st-key-main_section [data-testid="stRadio"] label {
         width: 100% !important;
-        min-width: 0 !important;
-        min-height: 48px !important;
-        height: auto !important;
-        white-space: normal !important;
-        text-align: left !important;
-        padding: 11px 14px !important;
-        font-size: 14px !important;
-        line-height: 1.35 !important;
-        border: 1px solid #dbe5f5 !important;
+        min-height: 46px !important;
+        display: flex !important;
+        align-items: center !important;
+        box-sizing: border-box !important;
+        margin: 0 !important;
+        padding: 10px 13px !important;
         border-radius: 11px !important;
+        white-space: normal !important;
     }
 
-    [data-testid="stTabs"] button[role="tab"] p {
+    .st-key-main_section [data-testid="stRadio"] label p {
         white-space: normal !important;
-        text-align: left !important;
-        font-size: 14px !important;
         line-height: 1.35 !important;
         margin: 0 !important;
     }
@@ -930,18 +908,23 @@ st.markdown("""
 # MAIN TABS
 # ==========================================
 
-tab1, tab2, tab3 = st.tabs([
-    "🔄 JPG / PDF Converter",
-    "📦 JPG & PDF Compressor",
-    "🪪 Passport Photo & Signature Resizer"
-])
+selected_section = st.radio(
+    "Choose a section",
+    [
+        "🔄 JPG / PDF Converter",
+        "📦 JPG & PDF Compressor",
+        "🪪 Passport Photo & Signature Resizer"
+    ],
+    horizontal=True,
+    key="main_section"
+)
 
 
 # ==========================================
 # FEATURE 1: JPG / PDF CONVERTER
 # ==========================================
 
-with tab1:
+if selected_section == "🔄 JPG / PDF Converter":
 
     st.markdown(
         '<div class="section-title">Image & PDF Converter</div>',
@@ -1110,7 +1093,7 @@ with tab1:
 # FEATURE 2: JPG & PDF COMPRESSOR
 # ==========================================
 
-with tab2:
+if selected_section == "📦 JPG & PDF Compressor":
 
     st.markdown(
         '<div class="section-title">File Compressor</div>',
@@ -1469,7 +1452,7 @@ with tab2:
 # FEATURE 3: PASSPORT PHOTO RESIZER
 # ==========================================
 
-with tab3:
+if selected_section == "🪪 Passport Photo & Signature Resizer":
 
     st.markdown(
         '<div class="section-title">Passport Photo &amp; Signature Resizer</div>',
