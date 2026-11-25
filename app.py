@@ -1,4 +1,5 @@
 
+
 import streamlit as st
 import img2pdf
 import fitz
@@ -13,7 +14,7 @@ from PIL import Image, ImageOps
 # ==========================================
 
 st.set_page_config(
-    page_title="JPG to PDF Converter & Resizer – Free Online Tool",
+    page_title="JPG PDF Converter | Smart File Studio",
     page_icon="📄",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -480,127 +481,6 @@ div.stDownloadButton > button * {
     }
 }
 
-/* ===== Larger text + richer but balanced colours ===== */
-html, body, [class*="css"], .stApp {
-    font-size: 17px !important;
-}
-
-p, li, label,
-[data-testid="stMarkdownContainer"],
-[data-testid="stWidgetLabel"],
-[data-testid="stCaptionContainer"] {
-    font-size: 17px !important;
-    line-height: 1.7 !important;
-}
-
-.main-title {
-    font-size: clamp(2.35rem, 4vw, 3.15rem) !important;
-    color: #163b80 !important;
-}
-
-.tagline {
-    font-size: 1.15rem !important;
-    color: #425a7d !important;
-}
-
-h1, h2, h3,
-[data-testid="stSubheader"] {
-    color: #244da0 !important;
-}
-
-.section-title {
-    font-size: 1.75rem !important;
-    color: #244da0 !important;
-}
-
-.hero-kicker {
-    background: linear-gradient(100deg, #dbeafe, #ede9fe) !important;
-    color: #4338a8 !important;
-    font-size: 13px !important;
-}
-
-.hero-pill {
-    background: linear-gradient(110deg, #ffffff, #f0f5ff) !important;
-    border-color: #c8d8fa !important;
-    color: #294c86 !important;
-    font-size: 13.5px !important;
-}
-
-[data-testid="stTabs"] button[role="tab"],
-[data-testid="stTabs"] button[role="tab"] p {
-    font-size: 16px !important;
-}
-
-[data-testid="stWidgetLabel"] p,
-[data-testid="stWidgetLabel"] label {
-    font-size: 16.5px !important;
-    color: #244477 !important;
-}
-
-[data-testid="stSidebar"] p,
-[data-testid="stSidebar"] li,
-[data-testid="stSidebar"] label {
-    font-size: 16px !important;
-}
-
-div.stButton > button,
-div.stDownloadButton > button {
-    font-size: 16px !important;
-}
-
-[data-testid="stFileUploader"] *,
-[data-testid="stFileUploader"] section,
-[data-testid="stFileUploader"] small {
-    font-size: 15.5px !important;
-}
-
-[data-testid="stMetric"] {
-    background: linear-gradient(135deg, #eef6ff 0%, #f3efff 100%) !important;
-    border: 1px solid #cbdaf8 !important;
-}
-
-[data-testid="stMetricLabel"] {
-    color: #405b88 !important;
-    font-size: 15px !important;
-}
-
-[data-testid="stMetricValue"] {
-    color: #2854b8 !important;
-}
-
-[data-testid="stExpander"] {
-    border-color: #cbd9f3 !important;
-    background: linear-gradient(120deg, #ffffff, #f6f8ff) !important;
-}
-
-[data-testid="stExpander"] summary,
-[data-testid="stExpander"] summary p {
-    color: #3155a0 !important;
-    font-size: 16px !important;
-}
-
-[data-testid="stRadio"] label {
-    background: linear-gradient(120deg, #ffffff, #f1f6ff) !important;
-    border-color: #cbdaf4 !important;
-}
-
-[data-testid="stFileUploader"] {
-    background: linear-gradient(135deg, #edf6ff 0%, #f4efff 100%) !important;
-    border-color: #8eabed !important;
-}
-
-@media (max-width: 768px) {
-    p, li, label, [data-testid="stMarkdownContainer"] {
-        font-size: 15.5px !important;
-    }
-    .main-title {
-        font-size: 2.15rem !important;
-    }
-    .tagline {
-        font-size: 1rem !important;
-    }
-}
-
 </style>
 """, unsafe_allow_html=True)
 
@@ -608,6 +488,30 @@ div.stDownloadButton > button {
 # ==========================================
 # COMMON HELPER FUNCTIONS
 # ==========================================
+
+def prepare_image_for_jpeg(image):
+
+    """Apply EXIF orientation and safely convert images to RGB.
+
+    Transparent PNG areas are placed on a white background so they do not
+    turn black when exported to JPEG or PDF.
+    """
+
+    image = ImageOps.exif_transpose(image)
+
+    if image.mode in ("RGBA", "LA") or (
+        image.mode == "P" and "transparency" in image.info
+    ):
+        rgba_image = image.convert("RGBA")
+        white_background = Image.new("RGB", rgba_image.size, "white")
+        white_background.paste(
+            rgba_image,
+            mask=rgba_image.getchannel("A")
+        )
+        return white_background
+
+    return image.convert("RGB")
+
 
 def convert_jpg_to_pdf(uploaded_images):
 
@@ -619,8 +523,7 @@ def convert_jpg_to_pdf(uploaded_images):
             io.BytesIO(uploaded_file.getvalue())
         )
 
-        image = ImageOps.exif_transpose(image)
-        image = image.convert("RGB")
+        image = prepare_image_for_jpeg(image)
 
         image_buffer = io.BytesIO()
 
@@ -748,8 +651,7 @@ def compress_jpg(uploaded_file, target_mb):
         )
 
     image = Image.open(io.BytesIO(original_bytes))
-    image = ImageOps.exif_transpose(image)
-    image = image.convert("RGB")
+    image = prepare_image_for_jpeg(image)
 
     best_under_target = None
     smallest_candidate = None
@@ -950,7 +852,7 @@ def compress_pdf_maximum(uploaded_pdf, target_mb):
 
 with st.sidebar:
 
-    st.markdown("## 📄 JPG to PDF Converter & Resizer")
+    st.markdown("## 📄 JPG PDF Converter")
     st.caption("Convert. Compress. Resize.")
 
     st.divider()
@@ -977,7 +879,7 @@ st.markdown("""
 <div class="hero-shell">
   <div class="hero-copy">
     <div class="hero-kicker">✦ SMART FILE TOOLKIT</div>
-    <div class="main-title">JPG to PDF Converter &amp; Resizer</div>
+    <div class="main-title">JPG PDF Converter</div>
     <div class="tagline">Everything you need to convert, compress and resize files — in one simple workspace.</div>
     <div class="hero-pills">
       <span class="hero-pill">↔ JPG / PDF Conversion</span>
@@ -1026,11 +928,11 @@ with tab1:
 
     if conversion_type == "JPG to PDF":
 
-        st.subheader("🖼️ JPG to PDF Converter")
+        st.subheader("🖼️ Image to PDF Converter")
 
         uploaded_images = st.file_uploader(
-            "Upload JPG Images",
-            type=["jpg", "jpeg"],
+            "Upload JPG, JPEG or PNG Images",
+            type=["jpg", "jpeg", "png"],
             accept_multiple_files=True,
             key="jpg_to_pdf"
         )
@@ -1059,7 +961,7 @@ with tab1:
                             use_container_width=True
                         )
 
-            if st.button("🔄 Convert JPG to PDF"):
+            if st.button("🔄 Convert Images to PDF"):
 
                 try:
 
@@ -1088,7 +990,7 @@ with tab1:
 
         else:
 
-            st.info("Upload one or multiple JPG images.")
+            st.info("Upload one or multiple JPG, JPEG or PNG images.")
 
     else:
 
@@ -1199,11 +1101,11 @@ with tab2:
 
     if compression_type == "JPG Compressor":
 
-        st.subheader("🖼️ JPG Image Compressor")
+        st.subheader("🖼️ Image Compressor")
 
         uploaded_jpg = st.file_uploader(
-            "Upload JPG Images",
-            type=["jpg", "jpeg"],
+            "Upload JPG, JPEG or PNG Images",
+            type=["jpg", "jpeg", "png"],
             accept_multiple_files=True,
             key="jpg_compress"
         )
@@ -1246,11 +1148,11 @@ with tab2:
                 f"{len(uploaded_jpg)} image(s) uploaded."
             )
 
-            if st.button("📦 Compress JPG Images"):
+            if st.button("📦 Compress Images"):
 
                 compressed_files = []
 
-                with st.spinner("Compressing JPG images..."):
+                with st.spinner("Compressing images..."):
 
                     for uploaded_file in uploaded_jpg:
 
@@ -1275,7 +1177,7 @@ with tab2:
 
                 if compressed_files:
 
-                    st.success("JPG compression completed!")
+                    st.success("Image compression completed!")
 
                     for filename, compressed in compressed_files:
 
