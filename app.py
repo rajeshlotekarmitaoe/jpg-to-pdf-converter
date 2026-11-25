@@ -1,5 +1,4 @@
 
-
 import streamlit as st
 import img2pdf
 import fitz
@@ -475,9 +474,45 @@ div.stDownloadButton > button * {
     p, li, label, [data-testid="stMarkdownContainer"] {
         font-size: 15px !important;
     }
-    [data-testid="stTabs"] button[role="tab"],
+
+    /* Keep all three main app sections clearly visible on mobile.
+       The tabs remain functional; only their mobile layout changes. */
+    [data-testid="stTabs"] [data-baseweb="tab-list"] {
+        display: flex !important;
+        flex-direction: column !important;
+        flex-wrap: nowrap !important;
+        align-items: stretch !important;
+        gap: 8px !important;
+        width: 100% !important;
+        height: auto !important;
+        overflow: visible !important;
+        padding: 9px !important;
+    }
+
+    [data-testid="stTabs"] button[role="tab"] {
+        display: flex !important;
+        flex: 0 0 auto !important;
+        justify-content: flex-start !important;
+        align-items: center !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        min-height: 48px !important;
+        height: auto !important;
+        white-space: normal !important;
+        text-align: left !important;
+        padding: 11px 14px !important;
+        font-size: 14px !important;
+        line-height: 1.35 !important;
+        border: 1px solid #dbe5f5 !important;
+        border-radius: 11px !important;
+    }
+
     [data-testid="stTabs"] button[role="tab"] p {
-        font-size: 13px !important;
+        white-space: normal !important;
+        text-align: left !important;
+        font-size: 14px !important;
+        line-height: 1.35 !important;
+        margin: 0 !important;
     }
 }
 
