@@ -1,0 +1,6 @@
+
+streamlit
+pillow
+pymupdf
+img2pdf
+pypdf
